@@ -30,6 +30,10 @@ input.onButtonPressed(Button.B, function () {
 input.onGesture(Gesture.Shake, function () {
     changer_nb_leds(randint(10, 120))
 })
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    changer_nb_leds(120)
+    music.play(music.builtinPlayableSoundEffect(soundExpression.twinkle), music.PlaybackMode.InBackground)
+})
 let temp = 0
 let err = ""
 let strip: neopixel.Strip = null
