@@ -7,7 +7,7 @@ input.onGesture(Gesture.LogoUp, function () {
 input.onButtonPressed(Button.A, function () {
     strip.clear()
     strip.show()
-    nb_leds = Math.max(20, nb_leds - 1)
+    nb_leds = Math.max(1, nb_leds - 1)
     strip = neopixel.create(DigitalPin.P0, nb_leds, NeoPixelMode.RGB)
     strip.showRainbow(1, 360)
 })
@@ -22,7 +22,14 @@ input.onGesture(Gesture.TiltRight, function () {
 input.onButtonPressed(Button.B, function () {
     strip.clear()
     strip.show()
-    nb_leds = Math.max(20, nb_leds + 1)
+    nb_leds = nb_leds + 1
+    strip = neopixel.create(DigitalPin.P0, nb_leds, NeoPixelMode.RGB)
+    strip.showRainbow(1, 360)
+})
+input.onGesture(Gesture.Shake, function () {
+    strip.clear()
+    strip.show()
+    nb_leds = randint(10, 120)
     strip = neopixel.create(DigitalPin.P0, nb_leds, NeoPixelMode.RGB)
     strip.showRainbow(1, 360)
 })
