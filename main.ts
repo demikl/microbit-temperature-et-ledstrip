@@ -1,3 +1,12 @@
+function changer_nb_leds (nb: number) {
+    if (strip) {
+        strip.clear()
+        strip.show()
+    }
+    strip = neopixel.create(DigitalPin.P0, nb, NeoPixelMode.RGB)
+    strip.showRainbow(1, 360)
+    nb_leds = nb
+}
 dstemp2wire.sensorError(function (errorMessage, errorCode, port) {
     err = errorMessage
 })
@@ -5,11 +14,7 @@ input.onGesture(Gesture.LogoUp, function () {
     basic.showNumber(nb_leds)
 })
 input.onButtonPressed(Button.A, function () {
-    strip.clear()
-    strip.show()
-    nb_leds = Math.max(1, nb_leds - 1)
-    strip = neopixel.create(DigitalPin.P0, nb_leds, NeoPixelMode.RGB)
-    strip.showRainbow(1, 360)
+    changer_nb_leds(Math.max(1, nb_leds - 1))
 })
 input.onGesture(Gesture.TiltRight, function () {
     temp = dstemp2wire.celsius(DigitalPin.P2)
@@ -20,26 +25,17 @@ input.onGesture(Gesture.TiltRight, function () {
     }
 })
 input.onButtonPressed(Button.B, function () {
-    strip.clear()
-    strip.show()
-    nb_leds = nb_leds + 1
-    strip = neopixel.create(DigitalPin.P0, nb_leds, NeoPixelMode.RGB)
-    strip.showRainbow(1, 360)
+    changer_nb_leds(nb_leds + 1)
 })
 input.onGesture(Gesture.Shake, function () {
-    strip.clear()
-    strip.show()
-    nb_leds = randint(10, 120)
-    strip = neopixel.create(DigitalPin.P0, nb_leds, NeoPixelMode.RGB)
-    strip.showRainbow(1, 360)
+    changer_nb_leds(randint(10, 120))
 })
 let temp = 0
 let err = ""
 let strip: neopixel.Strip = null
 let nb_leds = 0
 nb_leds = 120
-strip = neopixel.create(DigitalPin.P0, nb_leds, NeoPixelMode.RGB)
-strip.showRainbow(1, 360)
+changer_nb_leds(nb_leds)
 basic.forever(function () {
     strip.rotate(1)
     strip.show()
