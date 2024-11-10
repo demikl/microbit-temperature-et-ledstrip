@@ -7,9 +7,17 @@ function changer_nb_leds (nb: number) {
     strip.showRainbow(1, 360)
     nb_leds = nb
 }
-dstemp2wire.sensorError(function (errorMessage, errorCode, port) {
-    err = errorMessage
-})
+function lireTemperaturePrecis () {
+    analog = pins.analogReadPin(AnalogPin.P1)
+    Vi = analog / 1023
+    R = Vi * 10000 / (1 - Vi)
+    step1 = 1 / (273.15 + 25)
+    calc_log = Math.log(R / 10000.0) / Math.log(10)
+    calc_log_ref = calc_log / 3950
+    T_kelvin = 1 / (step1 + calc_log_ref)
+    T_celsius = T_kelvin - 273.15
+    temperature = T_celsius
+}
 input.onGesture(Gesture.LogoUp, function () {
     basic.showNumber(nb_leds)
 })
@@ -17,12 +25,11 @@ input.onButtonPressed(Button.A, function () {
     changer_nb_leds(Math.max(1, nb_leds - 1))
 })
 input.onGesture(Gesture.TiltRight, function () {
-    temp = dstemp2wire.celsius(DigitalPin.P2)
-    if (temp > -300) {
-        basic.showNumber(temp)
-    } else {
-        basic.showString(err)
-    }
+    lireTemperaturePrecis()
+    basic.showNumber(temperature)
+})
+input.onGesture(Gesture.TiltLeft, function () {
+    basic.showNumber(pins.analogReadPin(AnalogReadWritePin.P1))
 })
 input.onButtonPressed(Button.B, function () {
     changer_nb_leds(nb_leds + 1)
@@ -34,12 +41,37 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     changer_nb_leds(120)
     music.play(music.builtinPlayableSoundEffect(soundExpression.twinkle), music.PlaybackMode.InBackground)
 })
-let temp = 0
-let err = ""
+function lireTemperatureSimple () {
+    calculTemp = pins.analogReadPin(AnalogReadWritePin.P1)
+    calculTemp = 1023 / calculTemp - 1
+    calculTemp = 10000 / calculTemp
+    calculTemp = calculTemp / 3950
+    calculTemp = calculTemp + 1 / (25 + 273.15)
+    calculTemp = 1 / calculTemp
+    calculTemp = calculTemp - 273.15
+    temperature = calculTemp
+}
+let calculTemp = 0
+let temperature = 0
+let T_celsius = 0
+let T_kelvin = 0
+let calc_log_ref = 0
+let calc_log = 0
+let step1 = 0
+let Vi = 0
+let analog = 0
 let strip: neopixel.Strip = null
 let nb_leds = 0
+serial.redirectToUSB()
+serial.writeLine("Hello world")
+let R = 0
 nb_leds = 120
 changer_nb_leds(nb_leds)
+loops.everyInterval(1000, function () {
+    lireTemperaturePrecis()
+    serial.writeNumber(T_celsius)
+    serial.writeLine("")
+})
 basic.forever(function () {
     strip.rotate(1)
     strip.show()
