@@ -9,8 +9,7 @@ function changer_nb_leds (nb: number) {
 }
 function lireTemperaturePrecis () {
     analog = pins.analogReadPin(AnalogPin.P1)
-    Vi = analog / 1023
-    R = Vi * 10000 / (1 - Vi)
+    R = analog * 10000 / (1023 - analog)
     step1 = 1 / (273.15 + 25)
     calc_log = Math.log(R / 10000.0) / Math.log(10)
     calc_log_ref = calc_log / 3950
@@ -58,19 +57,23 @@ let T_kelvin = 0
 let calc_log_ref = 0
 let calc_log = 0
 let step1 = 0
-let Vi = 0
 let analog = 0
 let strip: neopixel.Strip = null
 let nb_leds = 0
+let R = 0
+let Vi = 0
 serial.redirectToUSB()
 serial.writeLine("Hello world")
-let R = 0
 nb_leds = 120
 changer_nb_leds(nb_leds)
 loops.everyInterval(1000, function () {
     lireTemperaturePrecis()
     serial.writeNumber(T_celsius)
-    serial.writeLine("")
+    serial.writeLine(" deg celsius")
+    serial.writeNumber(R)
+    serial.writeLine(" ohms")
+    serial.writeNumber(analog)
+    serial.writeLine(" /1024")
 })
 basic.forever(function () {
     strip.rotate(1)
