@@ -30,6 +30,14 @@ input.onGesture(Gesture.TiltRight, function () {
 input.onGesture(Gesture.TiltLeft, function () {
     basic.showNumber(pins.analogReadPin(AnalogReadWritePin.P1))
 })
+input.onButtonPressed(Button.AB, function () {
+    modeThermomètre = !(modeThermomètre)
+    if (modeThermomètre) {
+        basic.showIcon(IconNames.Heart)
+    } else {
+        basic.showIcon(IconNames.EighthNote)
+    }
+})
 input.onButtonPressed(Button.B, function () {
     changer_nb_leds(nb_leds + 1)
 })
@@ -40,17 +48,6 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
     changer_nb_leds(120)
     music.play(music.builtinPlayableSoundEffect(soundExpression.twinkle), music.PlaybackMode.InBackground)
 })
-function lireTemperatureSimple () {
-    calculTemp = pins.analogReadPin(AnalogReadWritePin.P1)
-    calculTemp = 1023 / calculTemp - 1
-    calculTemp = 10000 / calculTemp
-    calculTemp = calculTemp / 3950
-    calculTemp = calculTemp + 1 / (25 + 273.15)
-    calculTemp = 1 / calculTemp
-    calculTemp = calculTemp - 273.15
-    temperature = calculTemp
-}
-let calculTemp = 0
 let temperature = 0
 let T_celsius = 0
 let T_kelvin = 0
@@ -59,24 +56,29 @@ let calc_log = 0
 let step1 = 0
 let analog = 0
 let strip: neopixel.Strip = null
+let modeThermomètre = false
 let nb_leds = 0
-let R = 0
 let Vi = 0
+let R = 0
 serial.redirectToUSB()
 serial.writeLine("Hello world")
 nb_leds = 120
 changer_nb_leds(nb_leds)
-loops.everyInterval(1000, function () {
-    lireTemperaturePrecis()
-    serial.writeNumber(T_celsius)
-    serial.writeLine(" deg celsius")
-    serial.writeNumber(R)
-    serial.writeLine(" ohms")
-    serial.writeNumber(analog)
-    serial.writeLine(" /1024")
+led.plotBarGraph(
+1023,
+1023
+)
+modeThermomètre = true
+basic.showIcon(IconNames.Heart)
+basic.forever(function () {
+    if (modeThermomètre) {
+        lireTemperaturePrecis()
+        strip.showBarGraph(Math.map(T_celsius, 23, 27, 0, 255), 255)
+    }
+    basic.pause(20)
 })
 basic.forever(function () {
-    strip.rotate(1)
-    strip.show()
-    basic.pause(1)
+    if (!(modeThermomètre)) {
+        strip.showBarGraph(input.soundLevel(), 255)
+    }
 })
