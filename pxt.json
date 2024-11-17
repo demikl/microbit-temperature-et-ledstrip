@@ -1,5 +1,6 @@
 {
     "name": "Temperature et ledstrip",
+    "version": "1.0.0",
     "description": "",
     "dependencies": {
         "core": "*",
